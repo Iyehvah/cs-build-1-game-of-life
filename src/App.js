@@ -1,5 +1,6 @@
 import React, {useState, useCallback, useRef} from 'react';
 import produce from 'immer';
+import './App.css'
 
 const numRows = 25;
 const numCols = 25;
@@ -40,10 +41,13 @@ const App = () => {
         for (let i = 0; i < numRows; i++) {
           for (let k = 0; k < numCols; k++) {
             let neighbors = 0;
+            //examines state of all eight neighbors
             neighboringCells.forEach(([x,y]) => {
+              //
               const newI = i + x;
               const newK = k + y;
               if(newI >= 0 && newI < numRows && newK >= 0 && newK < numCols) {
+                //swap current values with new values
                 neighbors += g[newI][newK]
               }
             })
@@ -60,26 +64,37 @@ const App = () => {
       });
     });
     generationRef.current++;
-    setTimeout(runSimulation, 1000);
+    setTimeout(runSimulation, 500);
   }, [])
 
-  return (
-    <>
-    <button onClick={() => {
-      setRunning(!running);
-      if(!running) {
-        runningRef.current = true;
-        runSimulation();
-        generationRef.current = 0;
-      }
-      generationRef.current++
-    }}
-    >
-      {running ? "stop" : "start"}  
-    </button>
+  const glider = () => {
+    setgrid((grid) => {
+      return produce(grid, gridCopy => {
+        for(let i = 10; i < 13; i++) {
+          gridCopy[i][10] = 1;
+        }
+        gridCopy[12][11] = 1;
+        gridCopy[11][12] = 1;
+      })
+    })
+  }
 
-    
-    <button onClick={() => {
+  const toad = () => {
+    setgrid((grid) => {
+        return produce(grid, gridCopy => {
+            for(let i = 10; i < 13; i++) {
+                gridCopy[i][10] = 1;
+            }
+            for(let j = 11; j < 12; j++) {
+                for(let k = 11; k < 14; k++) {
+                    gridCopy[k][j] = 1;
+                }
+            }
+        })
+    })
+  }
+
+  const clear = () => {
       if(runningRef.current) {
         return
       }
@@ -93,15 +108,40 @@ const App = () => {
         })
       })
       generationRef.current = 0;
-    }}>
+    }
+
+    const simulate = () => {
+        setRunning(!running);
+        if(!running) {
+          runningRef.current = true;
+          runSimulation();
+          generationRef.current = 0;
+        }
+        generationRef.current++
+    }
+    
+
+  return (
+    <div className="simulation-container">
+    <button onClick={simulate}>
+      {running ? "stop" : "start"}  
+    </button>
+
+    <button onClick={clear}>
       clear
+    </button>
+    <button onClick={glider}>
+      glider
+    </button>
+    <button onClick={toad}>
+      toad
     </button>
 
 
     <div>
-      Generation: {`${generationRef.current}`}
+      <h1>Generation: {`${generationRef.current}`}</h1>
     </div>
-      <div style={{
+      <div className="grid-container"style={{
       display: "grid",
       gridTemplateColumns: `repeat(${numCols}, 20px)`
     }}>
@@ -115,13 +155,14 @@ const App = () => {
              })
              setgrid(newGrid);
            }}
-          style={{ width: 20,
-            height: 20, backgroundColor: grid[i][k] ? 'red' : undefined,
+          style={{
+            width: 20,
+            height: 20, backgroundColor: grid[i][k] ? 'black' : 'white',
             border: "solid 1px black"
           }} />)
         ))}
       </div>
-      </>
+      </div>
     );
   }
 

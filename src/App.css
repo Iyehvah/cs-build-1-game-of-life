@@ -1,0 +1,13 @@
+* {
+    text-align: center;
+    background-color: gray;
+}
+
+.grid-container {
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    background-color: lime;
+}
