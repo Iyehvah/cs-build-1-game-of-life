@@ -24,6 +24,8 @@ const App = () => {
     return rows;
   });
 
+
+  let speed = 1000;
   const [running, setRunning] = useState(false);
 
   let generation = 0;
@@ -64,7 +66,7 @@ const App = () => {
       });
     });
     generationRef.current++;
-    setTimeout(runSimulation, 500);
+    setTimeout(runSimulation, speed);
   }, [])
 
   const glider = () => {
@@ -85,12 +87,27 @@ const App = () => {
             for(let i = 10; i < 13; i++) {
                 gridCopy[i][10] = 1;
             }
-            for(let j = 11; j < 12; j++) {
-                for(let k = 11; k < 14; k++) {
-                    gridCopy[k][j] = 1;
+            for(let k = 11; k < 12; k++) {
+                for(let j = 11; j < 14; j++) {
+                    gridCopy[j][k] = 1;
                 }
             }
         })
+    })
+  }
+
+  const randomize = () => {
+    if(runningRef.current) {
+      return
+    }
+    setgrid((grid) => {
+      return produce(grid, gridCopy => {
+        for(let i = 0; i < numRows; i++) {
+          for(let k = 0; k < numCols; k++) {
+            gridCopy[i][k] = Math.round(Math.random());
+          }
+        }
+      })
     })
   }
 
@@ -119,14 +136,24 @@ const App = () => {
         }
         generationRef.current++
     }
-    
+
+    const faster = () => {
+      setRunning(!running)
+      setTimeout(runSimulation, 500)
+      setRunning(running)
+    }
+
+    const slower = () => {
+      setRunning(!running)
+      setTimeout(runSimulation, 2000)
+      setRunning(running)
+    }
 
   return (
     <div className="simulation-container">
     <button onClick={simulate}>
       {running ? "stop" : "start"}  
     </button>
-
     <button onClick={clear}>
       clear
     </button>
@@ -135,6 +162,15 @@ const App = () => {
     </button>
     <button onClick={toad}>
       toad
+    </button>
+    <button onClick={randomize}>
+      randomize
+    </button>
+    <button onClick={faster}>
+      faster
+    </button>
+    <button onClick={slower}>
+      slower
     </button>
 
 
@@ -161,6 +197,14 @@ const App = () => {
             border: "solid 1px black"
           }} />)
         ))}
+      </div>
+      <div>
+        <h2>About This Game</h2>
+        <div className="Rules-div">
+          <h3>Rules</h3>
+          <p>The <span>alive</span> state. A cell will be or become alive if and when it has 2 or 3 neighbors at any given time.</p>
+          <p>The <span>death</span> state. Contrary to the alive state if a cell has no neighbors it will die off. It can come back to life IF it has exactly 3 neighbors at any given time.</p>
+        </div>
       </div>
       </div>
     );
