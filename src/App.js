@@ -4,6 +4,7 @@ import './App.css'
 
 const numRows = 25;
 const numCols = 25;
+
 const neighboringCells = [
   [0, 1],
   [0, -1],
@@ -24,8 +25,7 @@ const App = () => {
     return rows;
   });
 
-
-  let speed = 1000;
+  const [speed, setSpeed] = useState(1000)
   const [running, setRunning] = useState(false);
 
   let generation = 0;
@@ -67,7 +67,7 @@ const App = () => {
     });
     generationRef.current++;
     setTimeout(runSimulation, speed);
-  }, [])
+  }, [numRows, numCols, speed])
 
   const glider = () => {
     setgrid((grid) => {
@@ -125,6 +125,7 @@ const App = () => {
         })
       })
       generationRef.current = 0;
+      
     }
 
     const simulate = () => {
@@ -137,16 +138,9 @@ const App = () => {
         generationRef.current++
     }
 
-    const faster = () => {
-      setRunning(!running)
-      setTimeout(runSimulation, 500)
-      setRunning(running)
-    }
-
-    const slower = () => {
-      setRunning(!running)
-      setTimeout(runSimulation, 2000)
-      setRunning(running)
+    const handleSpeed = (e) => {
+      const toNum = e.target.value
+      setTimeout(runSimulation(), setSpeed(toNum))
     }
 
   return (
@@ -166,12 +160,30 @@ const App = () => {
     <button onClick={randomize}>
       randomize
     </button>
-    <button onClick={faster}>
-      faster
-    </button>
-    <button onClick={slower}>
-      slower
-    </button>
+    <label
+      htmlFor="speed">
+      <select 
+            id="speed"
+            onChange={handleSpeed}
+            disabled={running}
+      >
+        <option value="1000">Default</option>
+        <option value="500">Fast</option>
+        <option value="50">Super Fast</option>
+      </select>
+      </label>
+      <label
+      htmlFor="speed">
+      <select 
+            id="speed"
+            onChange={handleSpeed}
+            disabled={running}
+      >
+        <option value="1000">Default</option>
+        <option value="2000">Slow</option>
+        <option value="3000">Super Slow</option>
+      </select>
+      </label>
 
 
     <div>
